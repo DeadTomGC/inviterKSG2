@@ -1,0 +1,16 @@
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\admnNotify.exe
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\admnNotify.pdb
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\protobuf-net.dll
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\SteamKit2.dll
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\SteamKit2.xml
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.exe
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.pdb
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\admnNotify.exe.manifest
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Release\admnNotify.application
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.exe.manifest
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.application
+C:\Users\DeadTomGC1\Documents\Visual Studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.exe
+C:\Users\DeadTomGC1\Documents\Visual Studio 2010\Projects\admnNotify\admnNotify\obj\x86\Release\admnNotify.pdb
+C:\Users\DeadTomGC1\Documents\Visual Studio 2010\Projects\inviter2.0KSG\admnNotify\obj\x86\Release\admnNotify.exe
+C:\Users\DeadTomGC1\Documents\Visual Studio 2010\Projects\inviter2.0KSG\admnNotify\obj\x86\Release\admnNotify.pdb

@@ -1,0 +1,4 @@
+67.219.107.2
+databasename
+dbuser
+dbpassword

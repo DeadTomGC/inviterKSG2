@@ -1,0 +1,8 @@
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Debug\admnNotify.exe
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Debug\admnNotify.pdb
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Debug\protobuf-net.dll
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Debug\SteamKit2.dll
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\bin\Debug\SteamKit2.xml
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Debug\admnNotify.exe
+C:\Users\DeadTomGC\documents\visual studio 2010\Projects\admnNotify\admnNotify\obj\x86\Debug\admnNotify.pdb

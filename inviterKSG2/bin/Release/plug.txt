@@ -1,0 +1,155 @@
+#include <sourcemod>
+
+#define CHAT_TRIGGER "/report"
+
+
+new bool:useDatabase = false;
+new Handle:g_hDb = INVALID_HANDLE;
+new Handle:Hostname;
+new Handle:Hostip;
+new Handle:Hostport;
+new int:lasttime = -240;
+
+
+public Plugin:myinfo =
+{
+        name = "reportBot Plugin",
+        author = "DeadTomGC",
+        description = "reffers reports to the bot",
+        
+        
+}
+
+
+public ConnectToDatabase()
+{
+	new String:error[255];
+	
+	if (SQL_CheckConfig("reportBot"))
+	{
+		g_hDb = SQL_Connect("reportBot",true,error, sizeof(error));
+		if (g_hDb == INVALID_HANDLE)		
+			PrintToServer("Failed to connect: %s", error);
+		else
+			useDatabase = true;
+	}
+	if (useDatabase) 
+	{
+		new String:driver[32];
+		new Handle:hDriver = SQL_ReadDriver(g_hDb, driver, 32);
+		CloseHandle(hDriver);		
+		LogMessage("DatabaseInit (CONNECTED) with db driver: %s", driver);
+		Hostname = FindConVar("hostname");
+		Hostip = FindConVar("ip");
+		Hostport = FindConVar("hostport");
+		
+	}	
+	
+}
+public OnPluginStart()
+{
+	ConnectToDatabase();
+	lasttime = -240;
+	RegConsoleCmd("report", report_msg);
+	AddCommandListener(say, "say");
+	AddCommandListener(sayTeam, "say_team");
+
+	
+	
+
+
+}
+public Action:report_msg(client, args)
+{
+	//decl String:temp[1000];
+	//decl String:temp2[1000];
+	if(useDatabase && GetGameTime()-240>=lasttime){
+		
+		PrintToServer("Submitting");
+		if(args>=5){
+			lasttime = GetGameTime();
+			PrintToChat(client,"Thanks for submitting a report. All online admins have been notified and an admin will be on in a couple of minutes. Please stand-by.");
+			decl String:query[1000]="INSERT INTO reports (player,serverip,message,servername) VALUES('";
+			decl String:temp[1000];
+			//decl String:temp2[1000];
+			new int:tempint=0;
+		
+		
+			GetClientName(client, temp, 700);
+			
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, "(");
+			GetClientAuthString(client, temp, 700);
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, ")");
+			StrCat(query, 1000, "','");
+			GetConVarString(Hostip, temp, 700);
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, ":");
+			GetConVarString(Hostport, temp, 700);
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, "','");
+			/*temp = " ";
+			while(tempint<args){
+				GetCmdArg(tempint + 1, temp2, 700);
+				StrCat(temp, 1000, temp2);
+				StrCat(temp, 1000, " ");
+				tempint = tempint + 1;
+			}*/
+			GetCmdArgString(temp, 1000);
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, "','");
+			GetConVarString(Hostname, temp, 700);
+			StrCat(query, 1000, temp);
+			StrCat(query, 1000, "')");
+			PrintToServer("sending data");
+			if (!SQL_FastQuery(g_hDb, query)){			
+					LogMessage("Can't add to table");
+					LogMessage(query);
+			}
+		}else{
+			PrintToChat(client,"Please provide us with a little more detail by typing a small message after /report.");
+		}
+	}else{
+	
+	PrintToServer("Please wait.");
+	//new int:num;
+	//IntToString(num, temp, 70);
+	//PrintToChat(client,"Please wait. %s", temp);
+	PrintToChat(client,"Someone reported a player recently and an admin is already on their way. If an admin doesn't show up in 5 minutes, try reporting again.");
+	}
+
+
+
+}
+public OnMapStart(){
+
+lasttime = -240;
+
+}
+public Action:say(client, const String:command[], argc){
+	decl String:temp[1000];
+	decl String:temp2[1000];
+	strcopy(temp2, 700, command);
+	TrimString(temp2);
+	if (StrEqual(temp2, CHAT_TRIGGER, false)){
+		
+		GetCmdArgString(temp, 700);
+		FakeClientCommand(client, temp);
+	}
+
+}
+public Action:sayTeam(client, const String:command[], argc){
+	decl String:temp[1000];
+	decl String:temp2[1000];
+	strcopy(temp2, 700, command);
+	TrimString(temp2);
+	if (StrEqual(temp2, CHAT_TRIGGER, false)){
+		
+		GetCmdArgString(temp, 700);
+		FakeClientCommand(client, temp);
+	}
+
+}
+
+
