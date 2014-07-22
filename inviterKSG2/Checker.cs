@@ -5,6 +5,8 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using System.Threading;
 using SteamKit2;
+using System.Net;
+using System.IO;
 
 namespace admnNotify
 {
@@ -14,40 +16,32 @@ namespace admnNotify
         public static String database;
         public static String user;
         public static String pass;
-        public static bool end = false,task = false,test=false;
-        public static int WIDTH = 4;
-        public static linkAR temp = new linkAR(WIDTH);
         public static SteamFriends friends;
+        public static SteamClient client;
         public static Args dataconv;
-        public static Dictionary<SteamID, int> logs = new Dictionary<SteamID, int>(); 
-        public static SteamID[] keystmp;
-        public static bool discon = false;
+        public static bool discon = false,end = false;
+        public static long lastpID = 0;
+        public static StreamWriter lastIDW;
+        public static StreamReader lastIDR;
 
         public static void run(object data)
         {
-            end = false;
-            task = false;
-            if (temp.getLength() != 0)
-            {
-                temp.setFirst();
-                if (temp.getCurrent() != null)
-                {
-                    //TODO: send messages
-                    for (int i = 0; i < friends.GetFriendCount(); i++)
-                    {
-                        if (friends.GetFriendPersonaState(friends.GetFriendByIndex(i)) != EPersonaState.Offline && friends.GetFriendPersonaState(friends.GetFriendByIndex(i)) != EPersonaState.Snooze)
-                            friends.SendChatMessage(friends.GetFriendByIndex(i), EChatEntryType.ChatMsg, temp.getCurrent()[0] + " has requested an admin on " + temp.getCurrent()[3] + ".  Message: " + temp.getCurrent()[2] + System.Environment.NewLine + "To respond, type: /accept");
-                    }
-                    //
-                    task = true;
-
-                }
-
-            }
             bool running = true;
             try{
 
-            
+                try
+                {
+                    lastIDR = new StreamReader("id.txt");
+                    lastpID = Convert.ToInt64(lastIDR.ReadLine().Trim());
+                    lastIDR.Close();
+                }
+                catch (Exception e)
+                {
+                    lastpID = 0;
+                }
+
+
+
                 dataconv = (Args)data;
                 host = dataconv.host;
                 database = dataconv.database;
@@ -57,9 +51,9 @@ namespace admnNotify
                 MySqlConnection conn = null;
 
                 Console.WriteLine("got to loop");
-                logThem("got to loop");
+                
                 MySqlCommand cmd = new MySqlCommand();
-                int count = 0;
+                //int count = 0;
                 while (running)
                 {
                     Thread.Sleep(15000);
@@ -69,77 +63,36 @@ namespace admnNotify
                         if (first)
                         {
                             conn = new MySqlConnection("host=" + host + ";database=" + database + ";username=" + user + ";password=" + pass + ";");
-                            Console.WriteLine("connected");
-                            logThem("connected");
+                            Console.WriteLine("connected to DB");
+                            
 
                             first = false;
                         }
                         cmd.Connection = conn;
                         conn.Open();
                         Console.WriteLine("conn opened");
-                        logThem("conn opened");
-                        if (test)
-                        {
-                            test = false;
-                            try
-                            {
-                                cmd.CommandText = "INSERT INTO reports (player,serverip,message,servername) VALUES('reportBot','this is not a legit ip','testing reportBot','not actually on a real server')";
-                                cmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                logThem(e.ToString());
-                            }
-                            Thread.Sleep(1000);
-                            
-                        }
+                        
 
-                        cmd.CommandText = "SELECT player, serverip, message, servername FROM reports";
+                        cmd.CommandText = "SELECT playerId,uniqueId FROM hlstats_PlayerUniqueIds WHERE uniqueId>'"+lastpID+"'";
                         MySqlDataReader rdr = cmd.ExecuteReader();
                         Console.WriteLine("reader created");
-                        logThem("reader created");
+                        long length = rdr.Depth;
                         while (rdr.Read())
                         {
-
-                            temp.AddEnd(); //also sets current to last
-                            Console.WriteLine("IN loop, created new end element");
-                            logThem("IN loop, created new end element");
-                            temp.setLast();
-
-                            temp.getCurrent()[0] = (String)rdr[0];
-                            temp.getCurrent()[1] = (String)rdr[1];
-                            temp.getCurrent()[2] = (String)rdr[2];
-                            if (((String)rdr[3]).Contains("kill-streak.net |"))
+                            lastpID = (long)rdr[0];
+                            SteamID newfriend = new SteamID((ulong)rdr[0]);
+                            using (WebClient reader = new WebClient())
                             {
-                                temp.getCurrent()[3] = ((String)rdr[3]).Substring(((String)rdr[3]).IndexOf("kill-streak.net |") + 17);
+                                string s = reader.DownloadString("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + newfriend.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
+                                Console.WriteLine("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + newfriend.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
+                                Console.WriteLine(s);
+                                lastIDW = new StreamWriter("id.txt");
+                                lastIDW.WriteLine(lastpID);
+                                lastIDW.Close();
                             }
-                            else
-                            {
-                                temp.getCurrent()[3] = (String)rdr[3];
-
-                            }
-                            Console.WriteLine(temp.getCurrent()[0] + "  " + temp.getCurrent()[1] + "  " + temp.getCurrent()[2] + "  " + temp.getCurrent()[3]);
-                            logThem(temp.getCurrent()[0] + "  " + temp.getCurrent()[1] + "  " + temp.getCurrent()[2] + "  " + temp.getCurrent()[3]);
-
+                            Thread.Sleep(15000);
                         }
                         rdr.Close();
-                        cmd.CommandText = "TRUNCATE reports";
-                        cmd.ExecuteNonQuery();
-                        conn.Close();
-                        temp.setFirst();
-                        if (temp.getCurrent() != null)
-                        {
-                            
-                            //TODO: send messages
-                            for (int i = 0; i < friends.GetFriendCount(); i++)
-                            {
-                                if (friends.GetFriendPersonaState(friends.GetFriendByIndex(i)) != EPersonaState.Offline && friends.GetFriendPersonaState(friends.GetFriendByIndex(i)) != EPersonaState.Snooze)
-                                    friends.SendChatMessage(friends.GetFriendByIndex(i), EChatEntryType.ChatMsg, temp.getCurrent()[0] + " has requested an admin on " + temp.getCurrent()[3] + ".  Message: " + temp.getCurrent()[2] + System.Environment.NewLine + "To respond, type: /accept");
-                            }
-                            //
-                            task = true;
-
-                        }
 
 
                     }
@@ -157,7 +110,7 @@ namespace admnNotify
                         catch (Exception exc) { };
 
                         Console.WriteLine("There was an error with the mySQL connection: " + e);
-                        logThem("There was an error with the mySQL connection: " + e);
+                        
                         discon = true;
                         Console.WriteLine("Reconnecting...");
                         while (discon)
@@ -177,7 +130,7 @@ namespace admnNotify
                             }
                             Thread.Sleep(1000);
                             Console.WriteLine("Reconnecting...");
-                            logThem("Reconnecting...");
+                            
                         }
 
                     }
@@ -192,18 +145,7 @@ namespace admnNotify
 
 
         }
-        public static void logThem(string msg)
-        {
-            try
-            {
-                keystmp = logs.Keys.ToArray();
-                for (int i = 0; i < keystmp.Length; i++)
-                {
-                    friends.SendChatMessage(keystmp[i], EChatEntryType.ChatMsg, msg);
-                }
-            }
-            catch (Exception e) { };
-        }
+        
     }
     class Args
     {
