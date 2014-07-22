@@ -8,7 +8,7 @@ using SteamKit2;
 using System.Net;
 using System.IO;
 
-namespace admnNotify
+namespace inviterKSG2
 {
     class Checker
     {

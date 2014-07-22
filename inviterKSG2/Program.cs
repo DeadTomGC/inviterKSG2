@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 using System.Net;
 using System.Diagnostics;
 
-namespace admnNotify
+namespace inviterKSG2
 {
     class Program
     {
@@ -26,7 +26,7 @@ namespace admnNotify
         static public Thread main = new Thread(Program.run);
         static Thread checker = null;
         static Thread keepOnline = null;
-        static bool hold = false;
+
         static void Main(string[] args)
         {
             
