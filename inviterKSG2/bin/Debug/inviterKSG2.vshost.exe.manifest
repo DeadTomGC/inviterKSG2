@@ -107,14 +107,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="inviterKSG2.exe" size="17408">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="inviterKSG2.exe" size="16896">
       <assemblyIdentity name="inviterKSG2" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>6leADLvJ8B2J3SpjRJ72B4o9rlQ=</dsig:DigestValue>
+        <dsig:DigestValue>BD01iWueDsw8buv0eIlwJ940RqI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -51,7 +51,7 @@ namespace inviterKSG2
                 MySqlConnection conn = null;
 
                 Console.WriteLine("got to loop");
-                
+                Console.Error.WriteLine("got to loop");
                 MySqlCommand cmd = new MySqlCommand();
                 //int count = 0;
                 while (running)
@@ -64,32 +64,28 @@ namespace inviterKSG2
                         {
                             conn = new MySqlConnection("host=" + host + ";database=" + database + ";username=" + user + ";password=" + pass + ";");
                             Console.WriteLine("connected to DB");
-                            
+                            Console.Error.WriteLine("connected to DB");
 
                             first = false;
                         }
                         cmd.Connection = conn;
                         conn.Open();
                         Console.WriteLine("conn opened");
-                        
+                        Console.Error.WriteLine("conn opened");
 
                         cmd.CommandText = "SELECT playerId,uniqueId FROM hlstats_PlayerUniqueIds WHERE uniqueId>'"+lastpID+"'";
                         MySqlDataReader rdr = cmd.ExecuteReader();
                         Console.WriteLine("reader created");
+                        Console.Error.WriteLine("reader created");
                         long length = rdr.Depth;
                         while (rdr.Read())
                         {
-                            lastpID = (long)rdr[0];
+                            lastpID = (long)rdr[1];
                             SteamID newfriend = new SteamID((ulong)rdr[0]);
-                            using (WebClient reader = new WebClient())
-                            {
-                                string s = reader.DownloadString("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + newfriend.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
-                                Console.WriteLine("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + newfriend.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
-                                Console.WriteLine(s);
-                                lastIDW = new StreamWriter("id.txt");
-                                lastIDW.WriteLine(lastpID);
-                                lastIDW.Close();
-                            }
+                            friends.AddFriend(newfriend);
+                            lastIDW = new StreamWriter("id.txt");
+                            lastIDW.WriteLine(lastpID);
+                            lastIDW.Close();
                             Thread.Sleep(15000);
                         }
                         rdr.Close();
@@ -99,7 +95,7 @@ namespace inviterKSG2
                     catch (System.Threading.ThreadAbortException e)
                     {
                         Console.WriteLine("Thread Aborted");
-
+                        Console.Error.WriteLine("Thread Aborted");
                     }
                     catch (Exception e)
                     {
@@ -110,9 +106,10 @@ namespace inviterKSG2
                         catch (Exception exc) { };
 
                         Console.WriteLine("There was an error with the mySQL connection: " + e);
-                        
+                        Console.Error.WriteLine("There was an error with the mySQL connection: " + e);
                         discon = true;
                         Console.WriteLine("Reconnecting...");
+                        Console.Error.WriteLine("Reconnecting...");
                         while (discon)
                         {
                             if (end) { throw new InvalidOperationException(); }
@@ -130,7 +127,7 @@ namespace inviterKSG2
                             }
                             Thread.Sleep(1000);
                             Console.WriteLine("Reconnecting...");
-                            
+                            Console.Error.WriteLine("Reconnecting...");
                         }
 
                     }
@@ -140,8 +137,11 @@ namespace inviterKSG2
                 }
 
                 Console.WriteLine("outside loop");
+                Console.Error.WriteLine("outside loop");
             }
-            catch (Exception e) { Console.WriteLine(e); }
+            catch (Exception e) { Console.WriteLine(e);
+            Console.Error.WriteLine(e);
+            }
 
 
         }

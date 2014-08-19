@@ -2,3 +2,5 @@
 databasename
 dbuser
 dbpassword
+Hello, welcome to KSG!
+76561197990973056

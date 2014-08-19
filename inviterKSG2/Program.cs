@@ -21,7 +21,6 @@ namespace inviterKSG2
         static public bool discon = false;
         static public bool recon = false;
         static public bool isRunning = true;
-        static public StreamWriter sw = null;
         static public bool ready = false;
         static public Thread main = new Thread(Program.run);
         static Thread checker = null;
@@ -39,10 +38,7 @@ namespace inviterKSG2
         public static void run()
         {
             ready = false;
-            if (sw == null)
-            {
-                sw = new StreamWriter("log.txt");
-            }
+           
             Dictionary<UInt64, String> ips = new Dictionary<UInt64, String>();
             Dictionary<SteamID, int> black = new Dictionary<SteamID, int>();
             Dictionary<SteamID, int> logs = new Dictionary<SteamID, int>();
@@ -52,14 +48,11 @@ namespace inviterKSG2
             try
             {
                 Console.WriteLine("*yawn* time to get to work...");
-                Console.WriteLine("VERSION 1.7.1 (Now with enough threads for the program and you cat!)");                 //                      <<<<<<<<----------------Version statement---------------->>>>>>>>
-                sw.WriteLine("*yawn* time to get to work...");
-                sw.Flush();
-
-
+                Console.Error.WriteLine("*yawn* time to get to work...");
+                Console.WriteLine("VERSION 1");                 //                      <<<<<<<<----------------Version statement---------------->>>>>>>>
+                Console.Error.WriteLine("VERSION 1");  
                 Console.WriteLine("Connecting...");
-                sw.WriteLine("Connecting...");
-                sw.Flush();
+                Console.Error.WriteLine("Connecting...");
                 ///////////////////////////////////////////////////////////     <<<<<<<<----------------Gather info---------------->>>>>>>> 
                 string user = "deadtomgchost", pass = "pass";
                 
@@ -76,10 +69,14 @@ namespace inviterKSG2
                 {
                     StreamWriter deets = new StreamWriter("logindeets.txt");
                     Console.WriteLine("Failed to load login details.");
+                    Console.Error.WriteLine("Failed to load login details.");
                     Console.WriteLine("Enter username and password");
+                    Console.Error.WriteLine("Enter username and password");
                     Console.Write("Username: ");
+                    Console.Error.Write("Username: ");
                     user = Console.ReadLine().Trim();
                     Console.Write("Password: ");
+                    Console.Error.Write("Password: ");
                     pass = Console.ReadLine().Trim();
                     deets.WriteLine(user);
                     deets.WriteLine(pass);
@@ -93,6 +90,8 @@ namespace inviterKSG2
                 String database = sr.ReadLine().Trim();
                 String dbuser = sr.ReadLine().Trim();
                 String dbpass = sr.ReadLine().Trim();
+                String greet = sr.ReadLine().Trim();
+                SteamID admin = new SteamID(System.UInt64.Parse(sr.ReadLine().Trim()));
                 sr.Close();
                 sr = null;
 
@@ -109,7 +108,7 @@ namespace inviterKSG2
                 ///////////////////////////////////////////////              <<<<<<<<---------------- Connect for the first time---------------->>>>>>>>
                 client.Connect();
                 
-                SteamID admin = new SteamID(76561197990973056);
+                //SteamID admin = new SteamID((ulong)76561197990973056);
                 
 
                 steamUser = client.GetHandler<SteamUser>();
@@ -142,16 +141,13 @@ namespace inviterKSG2
                             if (c.Result != EResult.OK)
                             {
                                 Console.WriteLine("Unable to connect to Steam: {0}", c.Result);
-                                sw.WriteLine("Unable to connect to Steam: {0}", c.Result);
-                                sw.Flush();
-
+                                Console.Error.WriteLine("Unable to connect to Steam: {0}", c.Result);
                                 //isRunning = false;
                                 return;
                             }
 
                             Console.WriteLine("Connected to Steam! Logging in '{0}'...", user);
-                            sw.WriteLine("Connected to Steam! Logging in '{0}'...", user);
-                            sw.Flush();
+                            Console.Error.WriteLine("Connected to Steam! Logging in '{0}'...", user);
                             discon = false;
                             steamUser.LogOn(new SteamUser.LogOnDetails
                             {
@@ -163,8 +159,7 @@ namespace inviterKSG2
                         callback.Handle<SteamClient.DisconnectedCallback>(c =>
                         {
                             Console.WriteLine("Disconnected from Steam");
-                            sw.WriteLine("Disconnected from Steam");
-                            sw.Flush();
+                            Console.Error.WriteLine("Disconnected from Steam");
 
                             discon = true;
                             if (Checker.end)
@@ -176,8 +171,7 @@ namespace inviterKSG2
                             if (c.Result != EResult.OK)
                             {
                                 Console.WriteLine("Unable to logon to Steam: {0} / {1}", c.Result, c.ExtendedResult);
-                                sw.WriteLine("Unable to logon to Steam: {0} / {1}", c.Result, c.ExtendedResult);
-                                sw.Flush();
+                                Console.Error.WriteLine("Unable to logon to Steam: {0} / {1}", c.Result, c.ExtendedResult);
                                 discon = true;
                                 return;
                             }
@@ -185,15 +179,10 @@ namespace inviterKSG2
                             {
 
                                 Console.WriteLine("Successfully logged on!");
-                                sw.WriteLine("Successfully logged on!");
-                                sw.Flush();
-
+                                Console.Error.WriteLine("Successfully logged on!");
 
                                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                using (WebClient reader = new WebClient())
-                                {
-                                    string s = reader.DownloadString("http://steamcommunity.com/groups/ksadmins/memberslistxml/?xml=1");
-                                }
+                                
                             }
                             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -212,8 +201,7 @@ namespace inviterKSG2
                             int friendCount = steamFriends.GetFriendCount();
 
                             Console.WriteLine("We have {0} friends", friendCount);
-                            sw.WriteLine("We have {0} friends", friendCount);
-                            sw.Flush();
+                            Console.Error.WriteLine("We have {0} friends", friendCount);
                             for (int x = 0; x < friendCount; x++)
                             {
                                 // steamids identify objects that exist on the steam network, such as friends, as an example
@@ -221,8 +209,7 @@ namespace inviterKSG2
 
                                 // we'll just display the STEAM_ rendered version
                                 Console.WriteLine("Friend: {0}", steamIdFriend.Render());
-                                sw.WriteLine("Friend: {0}", steamIdFriend.Render());
-                                sw.Flush();
+                                Console.Error.WriteLine("Friend: {0}", steamIdFriend.Render());
                             }
 
                             // we can also iterate over our friendslist to accept or decline any pending invites
@@ -234,15 +221,27 @@ namespace inviterKSG2
                                     // this user has added us, NOPE!!
                                     steamFriends.RemoveFriend(friend.SteamID);
                                 }
-                            }
-                            for (int i = 0; i < steamFriends.GetFriendCount(); i++)
-                            {
-                                if (ips.ContainsKey(steamFriends.GetFriendByIndex(i)) == false)
+                                if (friend.Relationship == EFriendRelationship.Friend)
                                 {
-                                    ips.Add(steamFriends.GetFriendByIndex(i), "0 null 0");
+                                    if (friend.SteamID.ConvertToUInt64() != admin.ConvertToUInt64())
+                                    {
+                                        // this user has accepted our invite, sure!
+                                        steamFriends.SendChatMessage(friend.SteamID, EChatEntryType.Typing, "");
+                                        Thread.Sleep(2000);
+                                        steamFriends.SendChatMessage(friend.SteamID, EChatEntryType.ChatMsg, greet);
+                                        using (WebClient reader = new WebClient())
+                                        {
+                                            string s = reader.DownloadString("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + friend.SteamID.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
+                                            Console.WriteLine("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + friend.SteamID.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
+                                            Console.Error.WriteLine("http://steamcommunity.com/actions/GroupInvite?type=groupInvite&inviter=" + client.SteamID.ConvertToUInt64() + "&invitee=" + friend.SteamID.ConvertToUInt64() + "&group=103582791432308455&sessionID=" + client.SessionID);
+                                            Console.WriteLine(s);
+                                            Console.Error.WriteLine(s);
+                                        }
+                                        steamFriends.RemoveFriend(friend.SteamID);
+                                    }
                                 }
-
                             }
+                            
                             Checker.friends = steamFriends;
                             Checker.client = client;
 
@@ -251,6 +250,7 @@ namespace inviterKSG2
                         callback.Handle<SteamFriends.FriendMsgCallback>(c =>            //  <<<<<<<<----------------LEAST IMPORTANT CALLBACK---------------->>>>>>>> 
                         {
                             Console.WriteLine("recieved: " + c.Message);
+                            Console.Error.WriteLine("recieved: " + c.Message);
                         });
 
 
@@ -258,9 +258,7 @@ namespace inviterKSG2
                         callback.Handle<SteamUser.LoggedOffCallback>(c =>
                         {
                             Console.WriteLine("Logged off of Steam: {0}", c.Result);
-                            sw.WriteLine("Logged off of Steam: {0}", c.Result);
-
-                            sw.Flush();
+                            Console.Error.WriteLine("Logged off of Steam: {0}", c.Result);
                             discon = true;
                             if (Checker.end)
                                 isRunning = false;
@@ -276,9 +274,7 @@ namespace inviterKSG2
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                sw.WriteLine(e);
-                sw.Flush();
-
+                Console.Error.WriteLine(e);
             }
 
             
@@ -297,24 +293,21 @@ namespace inviterKSG2
                 if (((Program.discon || Program.steamFriends.GetPersonaState() == EPersonaState.Offline) && Program.isRunning) || Program.recon)
                 {
                     Console.WriteLine("Currently Offline.");
-                    Program.sw.WriteLine("Currently Offline.");
-                    Program.sw.Flush();
+                    Console.Error.WriteLine("Currently Offline.");
                     if (Program.stw.IsRunning)
                     {
                         if (Program.stw.ElapsedMilliseconds >= 30000)
                         {
                             restarting = true;
                             Console.WriteLine("restart desired");
-                            Program.sw.WriteLine("restart desired");
-                            Program.sw.Flush();
+                            Console.Error.WriteLine("restart desired");
                             Program.recon = false;
                             while (Program.ready == false)
                             {
                                 Thread.Sleep(1000);
                             }
                             Console.WriteLine("Attempting restart.");
-                            Program.sw.WriteLine("Attempting restart.");
-                            Program.sw.Flush();
+                            Console.Error.WriteLine("Attempting restart.");
                             Program.main.Abort();
                             Thread.Sleep(1000);
                             Program.client = new SteamClient(Program.type);
